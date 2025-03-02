@@ -5,18 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vault Game</title>
     <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background-color: black;
-            color: white;
-        }
-
         /* Container for vault background */
         .background-container {
-            width: 100vw;
+            width: 96vw;
             height: 100vh;
-            background-image: url("{{ url_for('static', filename='vault_background.jpg') }}");
+            background-image: url("vault_background.jpg"); /* Updated to direct path */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -32,10 +25,40 @@
             color: white;
             border: none;
             border-radius: 5px;
-            margin: 5px;
         }
 
-        /* Positioning vault input */
+        /* Positioning buttons */
+        #demo-button {
+            position: absolute;
+            top: 100px;
+            left: 75px;
+        }
+
+        #tip-button {
+            position: absolute;
+            top: 37.3%;
+            left: 10%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 160px;
+            font-size: 36px;
+            border-radius: 50%;
+            background-color: gold;
+            color: black;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid black;
+        }
+
+        #bonus-button {
+            position: absolute;
+            top: 200px;
+            left: 75px;
+        }
+
+        /* Lowering the Vault Code input */
         #vault-code-container {
             position: absolute;
             bottom: 20%;
@@ -56,22 +79,22 @@
 
         /* Enlarged result text positioned at the bottom */
         #result {
-            font-size: 36px;
+            font-size: 72px;
             font-weight: bold;
             position: absolute;
             bottom: 5%;
             left: 50%;
-            color: hotpink;
             transform: translateX(-50%);
             text-align: center;
             width: 100%;
         }
 
         h1 {
-            font-size: 50px;
+            font-size: 120px;
             color: gold;
             font-weight: bold;
             text-align: center;
+            margin-top: 1px;
         }
     </style>
 </head>
@@ -79,7 +102,12 @@
     <div class="background-container">
         <h1>Vault Game</h1>
 
-        <!-- Vault Code Input -->
+        <!-- Repositioned Buttons -->
+        <button class="button" id="demo-button" onclick="demoMode()">Demo Mode</button>
+        <button class="button" id="tip-button" onclick="tipMode()">Tip</button>
+        <button class="button" id="bonus-button" onclick="bonusMode()">Bonus</button>
+
+        <!-- Lowered Vault Code Section -->
         <div id="vault-code-container">
             <input type="password" id="set-code" placeholder="Set Vault Code">
             <button class="button" onclick="setCode()">Set Code</button>
@@ -87,42 +115,40 @@
             <button class="button" onclick="checkCode()">Submit</button>
         </div>
 
-        <!-- Result Display -->
+        <!-- Enlarged Result Text Positioned at Bottom -->
         <div id="result"></div>
     </div>
 
     <script>
+        let vaultCode = "";
+
         function setCode() {
-            let code = document.getElementById('set-code').value;
-            fetch('/set_code', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: code })
-            }).then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('result').innerText = "Vault Code Set!";
-                } else {
-                    document.getElementById('result').innerText = data.error;
-                }
-            });
+            vaultCode = document.getElementById('set-code').value;
+            document.getElementById('set-code').value = '';
+            alert("Vault code set!");
         }
 
         function checkCode() {
             let guess = document.getElementById('guess').value;
-            fetch('/check_code', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ guess: guess })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('result').innerText = `Congratulations! You won $${data.prize}`;
-                } else {
-                    document.getElementById('result').innerText = `Unlucky! You could have won $${data.fake_prize}`;
-                }
-            });
+            let resultText = document.getElementById('result');
+            
+            if (guess === vaultCode) {
+                resultText.innerText = `Congratulations! You won $${Math.floor(Math.random() * 1000)}`;
+            } else {
+                resultText.innerText = "Unlucky! Try again.";
+            }
+        }
+
+        function demoMode() {
+            alert("Demo Mode Activated!");
+        }
+
+        function tipMode() {
+            alert("Tip Received!");
+        }
+
+        function bonusMode() {
+            alert("Bonus Activated!");
         }
     </script>
 </body>
